@@ -1,0 +1,178 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="styles.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="script.js"></script>
+        <title>Assignment-5: Quiz App</title>
+
+
+
+<style>
+            @import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Source+Sans+Pro:wght@200;300;400;600;700&display=swap");
+* {
+  margin: 0%;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  margin: 0%;
+  color: #fad744;
+  background-color: #54c3ef;
+}
+.quiz-heading {
+  margin-top: 35px;
+  margin-bottom: 25px;
+  font-size: 80px;
+  text-align: center;
+  text-shadow: 2px 4px black;
+  font-family: Caveat Brush;
+}
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 15px;
+}
+.form {
+  position: relative;
+  border: 1px solid;
+  width: 55%;
+  margin-left: 20%;
+  font-family: Source Sans Pro;
+  background-color: #2b3252;
+  border-radius: 10px;
+}
+.options-wrapper {
+  margin-bottom: 40px;
+}
+.Question-wrapper {
+  margin: 25px;
+  border-bottom: 1.2px solid #fad744;
+}
+.option {
+  margin: 20px 0;
+  font-size: 20px;
+  font-weight: 400;
+}
+.labels {
+  cursor: pointer;
+}
+
+.labels input {
+  margin-right: 10px;
+}
+
+#form-submit {
+  cursor: pointer;
+  text-align: center;
+  padding: 10px 15px;
+  background-color: #fad744;
+  border-radius: 10px;
+  border: 0;
+  margin: 10px 45%;
+}
+.score-div {
+  border-radius: 10px;
+  color: black;
+  width: 12%;
+  height: 250px;
+  margin-left: 10px;
+  background-color: white;
+  position: sticky;
+  top: 10px;
+  font-family: Source Sans Pro;
+}
+.scorelabel {
+  padding: 50px 0 0 20px;
+  font-size: 20px;
+}
+.marks {
+  padding: 20px 0 0 20px;
+  font-size: 40px;
+  font-weight: 700;
+}
+.resetBtn {
+  display: none;
+}
+.loader {
+  display: flex;
+  justify-content: center;
+  margin: 100px auto;
+}
+ </style>
+      </head>
+      <body>
+        <h1 class="quiz-heading">The Quiz App</h1>
+        <div class="form-wrapper">
+          <form class="form" id="quizApp" method="post">
+            <div>
+              <div class="loader">Loading...</div>
+            </div>
+          </form>
+          <div class="score-div"></div>
+        </div>
+      </body>
+      <script>
+      $(function () {
+        $.get("https://5d76bf96515d1a0014085cf9.mockapi.io/quiz", function (res) {
+          console.log(res);
+          let finalApires = res;
+          let questionWrap = "";
+          for (let i = 0; i < res.length; i++) {
+            questionWrap += `<div class="Question-wrapper"> <h2 class="quiz-question"> Q${
+              i + 1 + ". " + res[i].question
+            }<h2>`;
+            questionWrap += `<div class="options-wrapper">`;
+            for (let j = 0; j < res[i].options.length; j++) {
+              questionWrap += `<div class="option">
+                        <label class="labels"><input type="radio" name="${res[i].id}"  value="${res[i].options[j]}">${res[i].options[j]}</label>
+                    </div>`;
+            }
+            questionWrap += `</div></div>`;
+          }
+          let submitwrapper = $(
+            `<input type="submit" id='form-submit'> <button type="reset" class="resetBtn" id="resetBtn">Submit</button>`
+          );
+      
+          $("#quizApp div").html(questionWrap);
+          $("#quizApp").append(submitwrapper);
+          let scoreWrap = $(".score-div");
+          let scorelabel = $("<div>");
+          scorelabel.text("Score :");
+          scorelabel.addClass("scorelabel");
+      
+          let score = $("<p>");
+          score.text("O/5");
+          score.addClass("marks");
+      
+          scoreWrap.append(scorelabel, score);
+          $("#form-submit").click(function (e) {
+            e.preventDefault();
+            let finalScore = 0;
+            let getAnswer = $("#quizApp div input[type=radio]:checked");
+            console.log(getAnswer);
+            if (finalApires) {
+              for (let i = 0; i < getAnswer.length; i++) {
+                let options = finalApires[getAnswer[i].name - 1]["options"];
+                console.log(options);
+                if (
+                  finalApires[getAnswer[i].name - 1]["answer"] ==
+                  options.indexOf(getAnswer[i].value) + 1
+                ) {
+                  finalScore++;
+                }
+              }
+              score.text(`${finalScore + "/" + finalApires.length}`);
+              $("#resetBtn").click();
+            }
+          });
+        });
+      });
+ </script>
+ </html>   
